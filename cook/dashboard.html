@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cook Dashboard | Hearthly</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <header>
+        <a href="../landing/index.html" class="logo">Hearthly</a>
+        <nav>
+            <a href="../browse/meals.html">Browse Meals</a>
+            <a href="../cook/dashboard.html" class="btn btn-primary">Cook Dashboard</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="dashboard-grid">
+            <aside class="sidebar">
+                <h3 id="chef-name">Loading...</h3>
+                <p style="font-size: 0.9rem; color: #666; margin-bottom: 2rem;">Cook Profile</p>
+                <nav class="sidebar-nav">
+                    <a href="#active-listings">My Active Listings</a>
+                    <a href="#order-requests">Incoming Orders</a>
+                    <a href="#earnings">Earnings Summary</a>
+                    <a href="../landing/index.html" style="margin-top: 2rem; color: var(--terracotta);">Sign Out</a>
+                </nav>
+            </aside>
+
+            <main>
+                <section id="active-listings" style="margin-bottom: 4rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h2>My Meal Listings</h2>
+                        <button class="btn btn-secondary" onclick="openNewListingModal()">+ Add New Listing</button>
+                    </div>
+                    <div id="listing-container" class="meal-grid">
+                        <!-- Listings go here -->
+                        <p>No active listings. Create one to start selling!</p>
+                    </div>
+                </section>
+
+                <section id="order-requests">
+                    <h2 style="margin-bottom: 1.5rem;">Incoming Order Requests</h2>
+                    <div id="order-container">
+                        <!-- Mock orders for demo if no real ones exist -->
+                        <div class="order-item">
+                            <div>
+                                <strong>Pasta Primavera x2</strong>
+                                <p style="font-size: 0.85rem; color: #666;">Requested by Buyer #4928 • Total: $34.00</p>
+                            </div>
+                            <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                <span class="status-badge status-pending">Pending</span>
+                                <button class="btn btn-primary btn-sm" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Confirm</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="earnings" style="margin-top: 4rem; background: var(--white); padding: 2rem; border-radius: 8px;">
+                    <h2>Earnings Summary</h2>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1.5rem;">
+                        <div style="text-align: center; border-right: 1px solid var(--gray);">
+                            <p style="font-size: 0.9rem; color: #666;">Total Sales</p>
+                            <p style="font-size: 1.5rem; font-weight: bold;">$0.00</p>
+                        </div>
+                        <div style="text-align: center; border-right: 1px solid var(--gray);">
+                            <p style="font-size: 0.9rem; color: #666;">Commisions (10%)</p>
+                            <p style="font-size: 1.5rem; font-weight: bold; color: var(--terracotta);">$0.00</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <p style="font-size: 0.9rem; color: #666;">Your Payout (90%)</p>
+                            <p style="font-size: 1.5rem; font-weight: bold; color: var(--sage);">$0.00</p>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Simple Modal Simulation -->
+    <div id="new-listing-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center;">
+        <div style="background: white; padding: 2.5rem; border-radius: 12px; width: 500px; max-width: 90%;">
+            <h2 style="margin-bottom: 1.5rem;">Create New Listing</h2>
+            <form id="listing-form">
+                <div class="form-group">
+                    <label>Meal Name</label>
+                    <input type="text" id="meal-name" required>
+                </div>
+                <div class="form-group">
+                    <label>Price per Portion ($)</label>
+                    <input type="number" step="0.01" id="meal-price" required>
+                </div>
+                <div class="form-group">
+                    <label>Portions Available</label>
+                    <input type="number" id="meal-qty" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="meal-desc" rows="3"></textarea>
+                </div>
+                <div style="display: flex; gap: 1rem;">
+                    <button type="button" class="btn" style="flex: 1; background: #ddd;" onclick="closeNewListingModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Publish Listing</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../shared/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = await Hearthly.getCurrentUser();
+            const profile = await Hearthly.getCookProfile(user.id);
+            if (profile) {
+                document.getElementById('chef-name').innerText = profile.name;
+            }
+        });
+
+        window.openNewListingModal = () => {
+            document.getElementById('new-listing-modal').style.display = 'flex';
+        }
+        window.closeNewListingModal = () => {
+            document.getElementById('new-listing-modal').style.display = 'none';
+        }
+
+        document.getElementById('listing-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = {
+                name: document.getElementById('meal-name').value,
+                price: parseFloat(document.getElementById('meal-price').value),
+                portions_available: parseInt(document.getElementById('meal-qty').value),
+                description: document.getElementById('meal-desc').value,
+                is_active: true
+            };
+            
+            try {
+                await Hearthly.createMealListing(data);
+                alert('Listing published!');
+                closeNewListingModal();
+                location.reload();
+            } catch (err) {
+                alert('Error: ' + err.message);
+            }
+        });
+    </script>
+</body>
+</html>
