@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Become a Cook | Hearthly</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <header>
+        <a href="../landing/index.html" class="logo">Hearthly</a>
+    </header>
+
+    <div class="container" style="max-width: 600px;">
+        <div style="background: var(--white); padding: 3rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
+            <h1 style="margin-bottom: 1rem; color: var(--terracotta);">Join the Kitchen</h1>
+            <p style="margin-bottom: 2rem; color: #666;">Start sharing your home-cooked masterpieces with your neighborhood.</p>
+
+            <form id="register-form">
+                <div class="form-group">
+                    <label>Full Name / Chef Name</label>
+                    <input type="text" id="cook-name" required placeholder="e.g. Grandma Rose">
+                </div>
+                <div class="form-group">
+                    <label>Short Bio</label>
+                    <textarea id="cook-bio" rows="3" placeholder="Tell us about your culinary background and passion..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>City</label>
+                    <input type="text" id="cook-city" required placeholder="e.g. Brooklyn">
+                </div>
+                <div class="form-group">
+                    <label>Specialty Cuisines (comma separated)</label>
+                    <input type="text" id="cook-cuisines" placeholder="e.g. Italian, Southern, Vegan">
+                </div>
+                
+                <div style="background: var(--gray); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+                    <h4 style="margin-bottom: 0.5rem;">Payout Preferences</h4>
+                    <p style="font-size: 0.85rem; margin-bottom: 1rem;">Choose how you want to receive your 90% share.</p>
+                    <div class="form-group">
+                        <select id="payout-method">
+                            <option value="paypal">PayPal</option>
+                            <option value="crypto">Crypto (Stablecoins)</option>
+                            <option value="payoneer">Payoneer</option>
+                        </select>
+                    </div>
+                    <input type="text" id="payout-address" placeholder="PayPal Email or Wallet Address">
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem;">Create My Cook Profile</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="../shared/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const try {
+                const { error } = await Hearthly.registerCook(data);
+                if (error) throw error;
+                alert('Success! Welcome to the Hearthly family.');
+                window.location.href = 'dashboard.html';
+            } catch (err) {
+                alert('Error: ' + err.message);
+            }
+        });
+    </script>
+</body>
+</html>
