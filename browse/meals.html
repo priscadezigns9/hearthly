@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Meals | Hearthly</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <header>
+        <a href="../landing/index.html" class="logo">Hearthly</a>
+        <nav>
+            <a href="../browse/meals.html">Browse Meals</a>
+            <a href="../buyer/dashboard.html">My Orders</a>
+            <a href="../cook/dashboard.html" class="btn btn-primary">Cook Dashboard</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1 style="margin-bottom: 2rem;">Available Home-Cooked Meals</h1>
+
+        <div style="background: var(--white); padding: 2rem; border-radius: 8px; margin-bottom: 3rem; display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                <label>City</label>
+                <input type="text" id="filter-city" placeholder="e.g. New York">
+            </div>
+            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                <label>Cuisine</label>
+                <select id="filter-cuisine">
+                    <option value="">All Cuisines</option>
+                    <option value="Italian">Italian</option>
+                    <option value="Mexican">Mexican</option>
+                    <option value="Indian">Indian</option>
+                    <option value="Caribbean">Caribbean</option>
+                    <option value="Chinese">Chinese</option>
+                </select>
+            </div>
+            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                <label>Dietary</label>
+                <select id="filter-dietary">
+                    <option value="">Any</option>
+                    <option value="Vegan">Vegan</option>
+                    <option value="Vegetarian">Vegetarian</option>
+                    <option value="Halal">Halal</option>
+                    <option value="Gluten-Free">Gluten-Free</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" id="search-btn">Search Meals</button>
+        </div>
+
+        <div class="meal-grid" id="meal-container">
+            <!-- Loading state -->
+            <p>Finding local chefs...</p>
+        </div>
+    </div>
+
+    <script src="../shared/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const container = document.getElementById('meal-container');
+            
+            async function renderMeals() {
+                container.innerHTML = '<p>Loading meals...</p>';
+                const city = document.getElementById('filter-city').value;
+                const cuisine = document.getElementById('filter-cuisine').value;
+                
+                const meals = await Hearthly.fetchMeals({ city, cuisine });
+                
+                if (!meals || meals.length === 0) {
+                    container.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 4rem;">
+                            <h3>No meals found in this area yet.</h3>
+                            <p>Try a different city or cuisine, or check back later!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = meals.map(meal => `
+                    <div class="card">
+                        <div class="card-img">Primary food photo — real image required</div>
+                        <div class="card-content">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <h3 class="card-title">${meal.name}</h3>
+                                <span class="price">$${meal.price}</span>
+                            </div>
+                            <p class="card-meta">by <strong>${meal.cooks?.name || 'Chef'}</strong> in ${meal.cooks?.city || 'Local'}</p>
+                            <p style="margin-bottom: 1.5rem; font-size: 0.95rem; height: 3rem; overflow: hidden; text-overflow: ellipsis;">${meal.description}</p>
+                            <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                                ${meal.dietary_tags ? meal.dietary_tags.map(tag => `<span style="font-size: 0.7rem; background: var(--gray); padding: 2px 8px; border-radius: 10px;">${tag}</span>`).join('') : ''}
+                            </div>
+                            <button class="btn btn-secondary" style="width: 100%;" onclick="orderMeal('${meal.id}', '${meal.cook_id}', ${meal.price})">Order Meal</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            window.orderMeal = async (mealId, cookId, price) => {
+                const qty = prompt("How many portions would you like?", "1");
+                if (qty && !isNaN(qty)) {
+                    await Hearthly.placeOrder(mealId, cookId, parseInt(qty), price);
+                }
+            }
+
+            document.getElementById('search-btn').addEventListener('click', renderMeals);
+            
+            // Initial render
+            renderMeals();
+        });
+    </script>
+</body>
+</html>
