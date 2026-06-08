@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders | Hearthly</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <header>
+        <a href="../landing/index.html" class="logo">Hearthly</a>
+        <nav>
+            <a href="../browse/meals.html">Browse Meals</a>
+            <a href="../buyer/dashboard.html">My Orders</a>
+            <a href="../cook/dashboard.html" class="btn btn-primary">Cook Dashboard</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1 style="margin-bottom: 2rem;">My Order History</h1>
+
+        <div id="order-history-container">
+            <!-- Example order card -->
+            <div class="order-item" style="border: 1px solid #ddd; padding: 2rem; background: white;">
+                <div style="display: flex; gap: 2rem;">
+                    <div style="width: 100px; height: 100px; background: var(--gray); display: flex; align-items: center; justify-content: center; font-size: 0.6rem; text-align: center; border-radius: 8px;">
+                        Primary food photo — real image required
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <h3>Homemade Beef Lasagna</h3>
+                            <span class="status-badge status-confirmed">Confirmed</span>
+                        </div>
+                        <p style="color: #666; margin-top: 0.5rem;">by <strong>Chef Luigi</strong></p>
+                        <p style="margin-top: 1rem;">Quantity: 2 portions • Total Price: $30.00</p>
+                        <p style="font-size: 0.8rem; color: #999; margin-top: 0.5rem;">Ordered on June 5, 2026</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <button class="btn btn-secondary" style="margin-bottom: 0.5rem; width: 150px;" onclick="alert('Payment status: Verified via PayPal')">View Receipt</button>
+                        <br>
+                        <button class="btn btn-primary" style="width: 150px;" onclick="openReviewModal('Lasagna')">Leave a Review</button>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; padding: 4rem; color: #999;">
+                <p>No other orders yet. Go find something delicious!</p>
+                <a href="../browse/meals.html" class="btn btn-secondary" style="display: inline-block; margin-top: 1.5rem;">Browse Meals</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Modal Simulation -->
+    <div id="review-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center;">
+        <div style="background: white; padding: 2.5rem; border-radius: 12px; width: 450px; max-width: 90%;">
+            <h2 id="review-title" style="margin-bottom: 1rem;">Review Order</h2>
+            <div class="form-group">
+                <label>Rating (1-5 stars)</label>
+                <select id="review-rating">
+                    <option value="5">⭐⭐⭐⭐⭐ (Excellent)</option>
+                    <option value="4">⭐⭐⭐⭐ (Great)</option>
+                    <option value="3">⭐⭐⭐ (Good)</option>
+                    <option value="2">⭐⭐ (Fair)</option>
+                    <option value="1">⭐ (Poor)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Comment</label>
+                <textarea id="review-comment" rows="4" placeholder="How was the food? Any feedback for the chef?"></textarea>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <button class="btn" style="flex: 1; background: #ddd;" onclick="closeReviewModal()">Cancel</button>
+                <button class="btn btn-primary" style="flex: 1;" onclick="submitReview()">Submit Review</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../shared/app.js"></script>
+    <script>
+        window.openReviewModal = (mealName) => {
+            document.getElementById('review-title').innerText = `Review: ${mealName}`;
+            document.getElementById('review-modal').style.display = 'flex';
+        }
+        window.closeReviewModal = () => {
+            document.getElementById('review-modal').style.display = 'none';
+        }
+        window.submitReview = () => {
+            alert('Thank you! Your review has been submitted to the chef.');
+            closeReviewModal();
+        }
+    </script>
+</body>
+</html>
